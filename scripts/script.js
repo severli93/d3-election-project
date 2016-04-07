@@ -8,8 +8,64 @@ let margin = {l: 0, r: 50, t: 50, b: 50}
 let w = d3.select(".container").node().offsetWidth - margin.l - margin.r;
 let h = window.innerHeight - margin.t - margin.b - 40;
 
-let dataLoaded = function(err, rows) {
-  console.log(rows);
+var USMap = d3.select('#USMap')
+        .append('svg')
+        .attr('width',w)
+        .attr('height',h)
+        .append('g')
+        .attr('class','.Us-Map1')
+        .attr("transform", 'translate('+margin.l+','+margin.t+')');
+
+//longitude and latitude of the center of US
+var USLngLat = [-101.805731,40.362118]
+//map projection
+var projection = d3.geo.mercator()
+    .translate([w/2,h/2])
+    .center([USLngLat[0],USLngLat[1]])
+    .scale(1000/1.7)
+
+var USMapPathGenerator=d3.geo.path().projection(projection);
+
+queue()
+    .defer(d3.json,"/data/US_states.geojson")
+    .defer(d3.json,"/data/state1.geojson")
+    .defer(d3.csv,"/data/primary_results.csv",parse)
+    .await(dataLoaded)
+
+
+function dataLoaded (err, states,state1, rows) {
+
+  console.log(projection)
+  console.log("state1 is ",state1.features.counties)
+
+    console.log("states are ",states.features)
+  console.log("results are ",rows);
+
+    var map1=USMap
+        .append('g')
+        .selectAll('map-states')
+        .data(states.features)
+
+    var map1Enter = map1.enter()
+        .append('g')
+        .attr('class','map-states')
+    //var map1Exit = map1.exit()
+    //    .transition()
+    //    .remove()
+    var map1Update=map1
+        .append('path')
+        .attr('d',function(d) {
+            //console.log(d.geometry);
+            var x = d.geometry;
+            console.log(x);
+            return USMapPathGenerator(x)
+            //return USMapPathGenerator(d.geometry);
+        })
+        .style('fill','white')
+        .style('stroke','rgba(100,50,250,1)')
+        .style('stroke-dasharray','1,1')
+
+
   var set = new Set(rows.map(function(element) {
     return element.state_abbreviation;
   }));
@@ -48,4 +104,4 @@ let dataLoaded = function(err, rows) {
     .attr("height", function(d) { return (h/data.length) - 10; })
 };
 
-d3.csv("/data/primary_results.csv", parse, dataLoaded);
+
