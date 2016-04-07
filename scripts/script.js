@@ -3,14 +3,14 @@
 let parse = function(row) {
   return row;
 };
-let margin = {l: 0, r: 50, t: 50, b: 50}
+let margin = {l: 0, r: 50, t: 20, b: 20}
 
 let width = d3.select(".canvas0").node().offsetWidth - margin.l - margin.r;
 let height = d3.select(".canvas0").node().offsetHeight - margin.l - margin.r;
 
 
 let w = d3.select(".canvas").node().offsetWidth - margin.l - margin.r;
-let h = d3.select(".canvas").node().offsetHeight - margin.t - margin.b - 40;
+let h = d3.select(".canvas").node().offsetHeight - margin.t - margin.b ;
 
 var USMap = d3.select('#USMap')
         .append('svg')
@@ -71,13 +71,13 @@ function dataLoaded (err, states,state1, rows,followerDataH,followerDataM,follow
 var CandidsGroup=USCandids.selectAll('.CandidsGroup')
     .data(followersData)
 
+
 var CandidsGroupEnter=CandidsGroup.enter()
     .append('g')
     .attr('class','CandidsGroup')
-    .attr('transform',function(d,i){
-        //console.log(i*(width/7))
-        return 'translate(' + (50+i*(width/7)) + ',' + (height/2) + ')';
-    })
+    .attr('transform','translate('+ width/2 +',' + height/2+')')
+    .style('opacity',1)
+    //circle
     CandidsGroupEnter
         .append('circle')
         .attr('r',function(d){return scaleR(d.followers)})
@@ -85,22 +85,40 @@ var CandidsGroupEnter=CandidsGroup.enter()
             if(d.party=="Democratic"){return'blue'}
             else {return 'red'}})
         .style('opacity','.8')
+    //text
     CandidsGroupEnter
         .append('text')
-        .attr('transform','translate(0,10)')
-        .attr('transform',function(d,i){
-            //console.log(i*(width/7))
-            return 'translate(' + (50+i*(width/7)) + ',' + (height/2) + ')';
-        })
+        .attr('transform','translate(0,60)')
         .attr('class','CandidName')
+        .style('text-anchor','middle')
+        .style('fill','rgb(50,50,50)')
         .text(function(d){return d.name})
+    CandidsGroupEnter
+        .append('text')
+        .attr('transform','translate(0,-50)')
+        .attr('class','CandidName')
         .style('text-anchor','middle')
         .style('fill','rgb(150,150,150)')
-var CandidsGroupExit = CandidsGroup.exit().transition().remove()
+        .text(function(d){return d.followers})
 
-    var CandidsGroupUpdate = CandidsGroup
-        .transition(1000)
-        .select('circle')
+    var CandidsGroupExit = CandidsGroup.exit().transition().duration(800)
+    CandidsGroupExit.remove()
+
+    var CandidsGroupUpdate = CandidsGroupEnter
+        .transition().duration(1600)
+        //.style('opacity',1)
+        .attr('transform',function(d,i){
+            //console.log(i*(width/7))
+            return 'translate(' + (50+i*(width/7)) + ',' + (height/2) + ')';})
+
+
+     //CandidsGroupUpdate
+     //   .select('circle')
+     //   .attr('r',function(d){return scaleR(d.followers)})
+        //.style('fill',function(d){
+        //    if(d.party=="Democratic"){return'blue'}
+        //    else {return 'red'}})
+        //.style('opacity','.8')
 
 /*draw map1 for the US map*/
   //console.log(projection)
