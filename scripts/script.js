@@ -56,6 +56,7 @@ queue()
 
 
 function dataLoaded (err, states,state1, rows,followerDataH,followerDataM,followerDataR,followerDataC,followerDataJK,followerDataB,followerDataD) {
+    loadVotesData();
     //console.log("followers data: ",followerDataH.data)
     var followersData = [
         { name: followerDataH.data[0].fullName,username: followerDataH.data[0].username, followers: +followerDataH.data[0].followedBy, party: "Democratic"},
@@ -168,5 +169,3 @@ var CandidsGroupExit = CandidsGroup.exit().transition().remove()
     .attr("width", function(d) { return scaleX(d.votes); })
     .attr("height", function(d) { return (h/data.length) - 10; })
 };
-
-
