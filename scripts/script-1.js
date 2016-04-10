@@ -36,14 +36,13 @@ var USLngLat = [-101.805731,40.362118]
 /*map1 US projection*/
 var projection = d3.geo.mercator()
     .translate([w/2,h/2])
-    .center([USLngLat[0],USLngLat[1]])
-    .scale(1200/3)
+    .center([USLngLat[0],(USLngLat[1]-5)])
+    .scale(1200/2.9)
 
 /*generate the path generator*/
 var USMapPathGenerator=d3.geo.path().projection(projection);
 queue()
-    .defer(d3.json,"/data/US_states.geojson")
-    .defer(d3.json,"/data/state1.geojson")
+    .defer(d3.json,"/data/US_states-1.geojson")
     .defer(d3.csv,"/data/primary_results.csv",parse)
     .defer(d3.json,"http://localhost:3000/followersDataForUsername/hillaryclinton")
     .defer(d3.json,"http://localhost:3000/followersDataForUsername/marcorubiofla")
@@ -55,7 +54,7 @@ queue()
     .await(dataLoaded)
 
 
-function dataLoaded (err, states,state1, rows,followerDataH,followerDataM,followerDataR,followerDataC,followerDataJK,followerDataB,followerDataD) {
+function dataLoaded (err, states,rows,followerDataH,followerDataM,followerDataR,followerDataC,followerDataJK,followerDataB,followerDataD) {
     //console.log("followers data: ",followerDataH.data)
     var followersData = [
         { name: followerDataH.data[0].fullName,username: followerDataH.data[0].username, followers: +followerDataH.data[0].followedBy, party: "Democratic"},
@@ -120,25 +119,31 @@ var CandidsGroupEnter=CandidsGroup.enter()
         .append('g')
         .selectAll('map-states')
         .data(states.features)
-
-    var map1Enter = map1.enter()
-        .append('g')
-        .attr('class','map-states')
-    //var map1Exit = map1.exit()
-    //    .transition()
-    //    .remove()
-    var map1Update=map1
+        .enter()
         .append('path')
-        .attr('d',function(d) {
-            //console.log(d.geometry);
-            var x = d.geometry;
-            //console.log(x);
-            return USMapPathGenerator(x)
-            //return USMapPathGenerator(d.geometry);
-        })
+        .attr('class','map-states')
+        .attr('d',USMapPathGenerator)
         .style('fill','rgba(100,50,250,1)')
-        //.style('stroke','rgba(100,50,250,1)')
         .style('stroke-dasharray','1,1')
+    //var map1Enter = map1.enter()
+    //    .append('g')
+    //    .attr('class','map-states')
+    ////var map1Exit = map1.exit()
+    ////    .transition()
+    ////    .remove()
+    //var map1Update=map1
+    //    .append('path')
+    //    .attr('d',function(d) {
+    //
+    //        //console.log(d.geometry);
+    //        var x = d.geometry;
+    //        //console.log(x);
+    //        return USMapPathGenerator(x)
+    //        //return USMapPathGenerator(d.geometry);
+    //    })
+    //    .style('fill','rgba(100,50,250,1)')
+    //    //.style('stroke','rgba(100,50,250,1)')
+    //    .style('stroke-dasharray','1,1')
 
     /*Navi's code~~~~~~~~~*/
   var set = new Set(rows.map(function(element) {
